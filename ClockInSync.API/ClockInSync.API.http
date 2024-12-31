@@ -1,0 +1,6 @@
+@ClockInSync.API_HostAddress = http://localhost:5250
+
+GET {{ClockInSync.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
