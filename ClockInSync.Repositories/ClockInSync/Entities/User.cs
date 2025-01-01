@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ClockInSync.Repositories.ClockInSync.Entities.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClockInSync.Repositories.Entities
@@ -18,7 +19,7 @@ namespace ClockInSync.Repositories.Entities
         public string Email { get; set; }
 
         [Required]
-        [StringLength(64)]
+        [StringLength(254)]
         public string Password { get; set; } = string.Empty; // Hash da senha
 
         [Required]
@@ -35,11 +36,5 @@ namespace ClockInSync.Repositories.Entities
         // Navegação para as configurações do usuário
         [ForeignKey("SettingsId")]
         public Settings Settings { get; set; }
-    }
-
-    public enum Role
-    {
-        Employee,
-        Admin
     }
 }

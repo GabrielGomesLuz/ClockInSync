@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClockInSync.API", "ClockInSync.API\ClockInSync.API.csproj", "{1E2ED383-FD95-4A92-927A-882E3F6FD8AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClockInSync.API", "ClockInSync.API\ClockInSync.API.csproj", "{1E2ED383-FD95-4A92-927A-882E3F6FD8AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClockInSync.Repositories", "ClockInSync.Repositories\ClockInSync.Repositories.csproj", "{7664D603-B108-48AF-8298-A9A301013DCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClockInSync.Repositories", "ClockInSync.Repositories\ClockInSync.Repositories.csproj", "{7664D603-B108-48AF-8298-A9A301013DCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClockInSync.Services", "ClockInSync.Services\ClockInSync.Services.csproj", "{CDE6A521-2D20-4DA2-AB09-B50339767FB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClockInSync.Services", "ClockInSync.Services\ClockInSync.Services.csproj", "{CDE6A521-2D20-4DA2-AB09-B50339767FB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE50314B-2C52-486D-A3E2-F7EF8950022A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
