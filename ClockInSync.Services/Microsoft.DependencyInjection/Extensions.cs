@@ -1,6 +1,5 @@
 ﻿using ClockInSync.Repositories.Microsoft.DependencyInjection;
-using ClockInSync.Services.PasswordManagementService;
-using Microsoft.AspNetCore.Identity;
+using ClockInSync.Services.TokenServices;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ClockInSync.Services.Microsoft.DependencyInjection
@@ -11,7 +10,7 @@ namespace ClockInSync.Services.Microsoft.DependencyInjection
         {
             services.AddClockInSyncRepositories();
             services.AddScoped<IUserService,UserService>();
-            services.AddScoped<IPasswordService,PasswordService>();
+            services.AddScoped<ITokenService, TokenService>();
             return services;
         }
     }

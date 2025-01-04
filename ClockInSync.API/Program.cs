@@ -5,8 +5,15 @@ using ClockInSync.Services.Microsoft.DependencyInjection;
 using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
+using ClockInSync.Services.TokenServices;
+using ClockInSync.Repositories.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<TokenService>();
 
 // Add services to the container.
 
@@ -31,6 +38,22 @@ builder.Services.AddDbContext<ClockInSyncDbContext>(options =>
 
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
+
+
+builder.Services.AddAuthentication(opt =>
+{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options => 
+options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+{
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+});
+
 
 builder.Services.AddAutoMapper(typeof(EntitiesToDtoMappingProfile));
 builder.Services.AddClockInSyncServices();

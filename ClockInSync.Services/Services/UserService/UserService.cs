@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
-using ClockInSync.Repositories.ClockInSync.Dtos.User;
 using ClockInSync.Repositories.ClockInSync.Dtos.User.UserResponse;
+using ClockInSync.Repositories.ClockInSync.Entities.Enums;
+using ClockInSync.Repositories.Dtos.User;
+using ClockInSync.Repositories.Dtos.User.UserResponse;
 using ClockInSync.Repositories.Entities;
 using ClockInSync.Repositories.Repositories;
 using ClockInSync.Services.PasswordManagementService;
+using ClockInSync.Services.TokenServices;
 
 namespace ClockInSync.Services
 {
@@ -11,6 +14,10 @@ namespace ClockInSync.Services
     public interface IUserService
     {
         Task<UserRegisterResponse> CreateUserAsync(UserCreationDto user);
+
+        Task<UserLoginResponse?> LoginUserAsync(UserLoginDto user);
+
+        Task<bool> VerifyUserExistsByEmailAsync(string email);
     }
 
 
@@ -19,13 +26,13 @@ namespace ClockInSync.Services
 
         private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
-        private readonly IPasswordService _passwordService;
+        private readonly ITokenService tokenService;
 
-        public UserService(IUserRepository userRepository,IMapper mapper,IPasswordService _passwordService)
+        public UserService(IUserRepository userRepository, IMapper mapper, ITokenService tokenService)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
-            this._passwordService = _passwordService;
+            this.tokenService = tokenService;
         }
 
         public async Task<UserRegisterResponse> CreateUserAsync(UserCreationDto userCreation)
@@ -34,12 +41,28 @@ namespace ClockInSync.Services
             user.Id = Guid.NewGuid();
             user.Settings.Id = Guid.NewGuid();
             // Cria o hash da senha
-            user.Password = _passwordService.HashPassword(user.Password,user.Id);
+            user.Password = PasswordHashHelper.HashPassword(user.Password, user);
 
-            bool tst = _passwordService.VerifyPassword(user.Password,userCreation.Password,user.Id);
             return await userRepository.CreateUserAsync(user);
         }
 
+        public async Task<UserLoginResponse?> LoginUserAsync(UserLoginDto userLogin)
+        {
+            var user = mapper.Map<User>(userLogin);
+            var userFound = await userRepository.VerifyUserLoginAsync(user);
 
+            if (userFound != null)
+            {
+                var token = tokenService.GenerateToken(user);
+                return new UserLoginResponse { JwtToken = token, Role = userFound.Role };
+
+            }
+            return null;
+        }
+
+        public async Task<bool> VerifyUserExistsByEmailAsync(string email)
+        {
+            return await userRepository.VerifyUserExistsByEmailAsync(email);
+        }
     }
 }

@@ -1,17 +1,15 @@
-﻿using ClockInSync.Repositories.Dtos.Settings;
+﻿using ClockInSync.Repositories.ClockInSync.Entities.Enums;
 
 namespace ClockInSync.Repositories.Dtos.User.UserResponse
 {
-    public class UserInformationResponse
+    public class UserLoginInformationResponse 
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
 
-        public SettingsDto Settings { get; set; }
-
-
-
+        public string Password { get; set; } = string.Empty;
+        public Role Role { get; set; }
     }
 }

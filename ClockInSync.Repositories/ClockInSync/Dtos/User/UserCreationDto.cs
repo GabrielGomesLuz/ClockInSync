@@ -2,7 +2,7 @@
 using ClockInSync.Repositories.Dtos.Settings;
 using System.ComponentModel.DataAnnotations;
 
-namespace ClockInSync.Repositories.ClockInSync.Dtos.User
+namespace ClockInSync.Repositories.Dtos.User
 {
     public class UserCreationDto
     {

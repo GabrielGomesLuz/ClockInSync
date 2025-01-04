@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ClockInSync.Repositories.ClockInSync.Dtos.User;
+using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Repositories.Entities;
 
 namespace ClockInSync.Repositories.ClockInSync.Mapper;
@@ -13,5 +13,7 @@ public class EntitiesToDtoMappingProfile : Profile
            WorkdayHours = src.Settings.WorkdayHours,
            OvertimeRate = src.Settings.OvertimeRate
        }));
+
+        CreateMap<UserLoginDto, User>();
     }
 }
