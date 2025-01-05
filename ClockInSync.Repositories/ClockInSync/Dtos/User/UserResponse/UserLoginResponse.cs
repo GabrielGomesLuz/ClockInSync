@@ -1,4 +1,4 @@
-﻿using ClockInSync.Repositories.ClockInSync.Entities.Enums;
+﻿using ClockInSync.Repositories.Entities.Enums;
 
 namespace ClockInSync.Repositories.Dtos.User.UserResponse
 {

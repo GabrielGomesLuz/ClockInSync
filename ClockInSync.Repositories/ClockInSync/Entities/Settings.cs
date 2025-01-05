@@ -11,6 +11,9 @@ namespace ClockInSync.Repositories.Entities
 
         public decimal OvertimeRate { get; set; }
 
+        public int WeeklyJourney { get; set; }
+
+
         // Navegação para o usuário
         public User User { get; set; }
     }

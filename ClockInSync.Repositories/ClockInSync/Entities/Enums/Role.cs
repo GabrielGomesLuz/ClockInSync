@@ -1,4 +1,4 @@
-﻿namespace ClockInSync.Repositories.ClockInSync.Entities.Enums
+﻿namespace ClockInSync.Repositories.Entities.Enums
 {
     public enum Role
     {

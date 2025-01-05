@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using ClockInSync.Repositories.ClockInSync.Dtos.User.UserResponse;
-using ClockInSync.Repositories.ClockInSync.Entities.Enums;
 using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Repositories.Dtos.User.UserResponse;
 using ClockInSync.Repositories.Entities;
+using ClockInSync.Repositories.PasswordManagementHelper;
 using ClockInSync.Repositories.Repositories;
-using ClockInSync.Services.PasswordManagementService;
 using ClockInSync.Services.TokenServices;
 
 namespace ClockInSync.Services
@@ -53,7 +52,8 @@ namespace ClockInSync.Services
 
             if (userFound != null)
             {
-                var token = tokenService.GenerateToken(user);
+                var u = mapper.Map<User>(userFound);
+                var token = tokenService.GenerateToken(u);
                 return new UserLoginResponse { JwtToken = token, Role = userFound.Role };
 
             }

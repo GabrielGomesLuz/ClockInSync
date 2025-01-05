@@ -1,4 +1,5 @@
 ﻿using ClockInSync.Repositories.Microsoft.DependencyInjection;
+using ClockInSync.Services.PunchClockServices;
 using ClockInSync.Services.TokenServices;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,7 @@ namespace ClockInSync.Services.Microsoft.DependencyInjection
             services.AddClockInSyncRepositories();
             services.AddScoped<IUserService,UserService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPunchClockService, PunchClockService>();
             return services;
         }
     }

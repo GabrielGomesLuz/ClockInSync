@@ -1,5 +1,5 @@
-﻿using ClockInSync.Repositories.ClockInSync.Entities.Enums;
-using ClockInSync.Repositories.Dtos.Settings;
+﻿using ClockInSync.Repositories.Dtos.Settings;
+using ClockInSync.Repositories.Entities.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClockInSync.Repositories.Dtos.User

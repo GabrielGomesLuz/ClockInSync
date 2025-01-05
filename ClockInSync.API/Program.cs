@@ -1,15 +1,14 @@
 using ClockInSync.Repositories.ClockInSync.Mapper;
 using ClockInSync.Repositories.DbContexts;
-using Microsoft.EntityFrameworkCore;
 using ClockInSync.Services.Microsoft.DependencyInjection;
-using Scalar.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 using ClockInSync.Services.TokenServices;
-using ClockInSync.Repositories.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +47,9 @@ builder.Services.AddAuthentication(opt =>
 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
 {
     ValidateIssuer = true,
+    ValidIssuer = builder.Configuration["Jwt:Issuer"],
     ValidateAudience = true,
+    ValidAudience = builder.Configuration["Jwt:Audience"], // Deve corresponder à audiência do token
     ValidateLifetime = true,
     ValidateIssuerSigningKey = true,
     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
@@ -82,7 +83,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 
 app.MapControllers();

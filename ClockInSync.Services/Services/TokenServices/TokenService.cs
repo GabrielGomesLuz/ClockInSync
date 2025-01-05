@@ -36,6 +36,8 @@ namespace ClockInSync.Services.TokenServices
                 Subject = GenerateClaims(user),
                 SigningCredentials = credentials,
                 Expires = DateTime.UtcNow.AddHours(2),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"]
             };
 
             //Gera um token

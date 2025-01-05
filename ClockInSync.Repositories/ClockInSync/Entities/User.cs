@@ -1,4 +1,4 @@
-﻿using ClockInSync.Repositories.ClockInSync.Entities.Enums;
+﻿using ClockInSync.Repositories.Entities.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

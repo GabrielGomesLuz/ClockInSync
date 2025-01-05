@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using ClockInSync.Repositories.Dtos.PunchClock;
 using ClockInSync.Repositories.Dtos.User;
+using ClockInSync.Repositories.Dtos.User.UserResponse;
 using ClockInSync.Repositories.Entities;
 
 namespace ClockInSync.Repositories.ClockInSync.Mapper;
@@ -15,5 +17,9 @@ public class EntitiesToDtoMappingProfile : Profile
        }));
 
         CreateMap<UserLoginDto, User>();
+
+        CreateMap<RegisterPunchClock, PunchClock>();
+
+        CreateMap<UserLoginInformationResponse, User>();
     }
 }
