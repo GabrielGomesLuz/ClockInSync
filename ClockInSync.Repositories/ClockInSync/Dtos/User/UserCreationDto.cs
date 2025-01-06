@@ -20,6 +20,13 @@ namespace ClockInSync.Repositories.Dtos.User
 
         [Required]
         public Role Role { get; set; }
+        [Required]
+        [StringLength(40)]
+        public string Department { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(30)]
+        public string Position {  get; set; } = string.Empty;
 
         [Required]
         public SettingsDto Settings { get; set; }

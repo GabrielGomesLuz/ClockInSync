@@ -23,14 +23,18 @@ namespace ClockInSync.Repositories.Entities
         public string Password { get; set; } = string.Empty; // Hash da senha
 
         [Required]
-        [StringLength(64)]
-        public string PasswordSalt { get; set; } = string.Empty;
-
-        [Required]
         public Role Role { get; set; }
 
+        [Required]
+        [StringLength(30)]
+        public string Position { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(40)]
+        public string Department { get; set; } = string.Empty;
+
         // Chave estrangeira para a tabela Settings
-        
+
         public Guid SettingsId { get; set; }
 
         // Navegação para as configurações do usuário
