@@ -54,6 +54,7 @@ namespace ClockInSync.Services.PunchClockServices
             punchClock.UserId = userId;
             punchClock.Id = Guid.NewGuid();
             punchClock.Timestamp = DateTime.Now;
+            punchClock.Message = punchClock.Type == PunchClock.PunchType.CheckIn ? "Entrada registrada com sucesso." : "Saída registrada com sucesso";
 
             return await punchClockRepository.RegisterPunchClockAsync(punchClock);
         }

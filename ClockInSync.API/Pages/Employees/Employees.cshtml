@@ -1,0 +1,113 @@
+﻿@page "/funcionarios"
+
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Funcionários</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <h1>Funcionários</h1>
+    <section class="content">
+        <table class="table align-middle mb-0 bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th></th>
+                    <th>Nome</th>
+                    <th>Departamento</th>
+                    <th>Nível</th>
+
+                </tr>
+            </thead>
+            <tbody id="user-list">
+            </tbody>
+        </table>
+    </section>
+
+
+    <script>
+
+
+                document.addEventListener("DOMContentLoaded", function() {
+            // Função para obter o token JWT do localStorage
+            const token = localStorage.getItem('jwt');
+
+            // Se o token não estiver presente, redirecione ou exiba uma mensagem de erro
+            if (!token) {
+                console.log('Usuário não autenticado. Redirecionando para o login...');
+                window.location.href = '/login';  // Redirecionar para a página de login (ou outro comportamento)
+                return;
+            }
+
+            // Fazer uma requisição GET para a API de Funcionários
+            fetch('/api/User/v1/users?offset=0&limit=10', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`  // Incluir o token JWT no cabeçalho Authorization
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Se a resposta não for ok (erro), você pode lidar com isso de acordo
+                    return response.json().then(errorData => {
+                        console.error('Erro:', errorData);
+                        alert('Erro ao carregar os funcionários. Você pode ser deslogado.');
+                        // Possivelmente redirecionar para o login se o token for inválido ou expirado
+                    });
+                }
+                return response.json(); // Caso a resposta seja bem-sucedida, converta para JSON
+            })
+            .then(data => {
+        const funcionarioList = document.getElementById('user-list');
+
+        // Limpar o conteúdo anterior, se necessário
+        funcionarioList.innerHTML = '';
+
+        // Iterar sobre os funcionários e adicionar cada um ao corpo da tabela
+        data.forEach(funcionario => {
+            // Criar uma nova linha (tr)
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td scope="row" style="width: 0;">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="First group">
+                        <a href="/funcionario/${funcionario.id}/detalhes" role="button" class="btn btn-acao">
+                            <i class="bi bi-info-square"></i>
+                        </a>
+                        <a href="/funcionario/editar" role="button" class="btn btn-acao">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </td>
+                <td>
+                    <div class="align-items-center">
+                        <p class="fw-bold mb-1" id="userName">${funcionario.name}</p>
+                        <p class="text-muted mb-0" id="userEmail">${funcionario.email}</p>
+                    </div>
+                </td>
+                <td>
+                    <p class="fw-normal mb-1">Software engineer</p>
+                    <p class="text-muted mb-0">IT department</p>
+                </td>
+                <td>Senior</td>
+            `;
+
+            // Adicionar a linha à tabela
+            funcionarioList.appendChild(row);
+        });
+            })
+            .catch(error => {
+                console.error('Erro ao buscar os dados dos funcionários:', error);
+            });
+        });
+
+    </script>
+</body>
+</html>

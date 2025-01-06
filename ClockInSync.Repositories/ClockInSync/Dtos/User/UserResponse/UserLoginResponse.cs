@@ -6,7 +6,8 @@ namespace ClockInSync.Repositories.Dtos.User.UserResponse
     {
 
         public string JwtToken { get; set; } = string.Empty;
-        public Role Role { get; set; } 
+        public Role Role { get; set; }
+        public string Message { get; set; } = string.Empty;
 
 
     }

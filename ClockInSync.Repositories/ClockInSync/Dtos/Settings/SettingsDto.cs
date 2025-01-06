@@ -11,6 +11,9 @@ namespace ClockInSync.Repositories.Dtos.Settings
         [Required]
         public decimal OvertimeRate { get; set; } = 0.0m;
 
+        [Required]
+        public int WeeklyJourney {  get; set; }
+
 
     }
 }

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\ClockInSync.Services\ClockInSync.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+  </ItemGroup>
+
 </Project>

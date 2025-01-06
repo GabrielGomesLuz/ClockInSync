@@ -19,6 +19,8 @@ namespace ClockInSync.Repositories.Entities
         [Required]
         public DateTime Timestamp { get; set; }  // Data e hora do punch
 
+        public string Message { get; set; } = string.Empty;
+
         // Relacionamento com o usuário
         [ForeignKey("UserId")]
         public User User { get; set; }

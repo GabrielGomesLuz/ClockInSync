@@ -1,10 +1,13 @@
 ﻿using ClockInSync.Repositories.ClockInSync.Dtos.User.UserResponse;
 using ClockInSync.Repositories.DbContexts;
+using ClockInSync.Repositories.Dtos.Settings;
 using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Repositories.Dtos.User.UserResponse;
 using ClockInSync.Repositories.Entities;
 using ClockInSync.Repositories.PasswordManagementHelper;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using static ClockInSync.Repositories.Entities.PunchClock;
 
 namespace ClockInSync.Repositories.Repositories
 {
@@ -20,11 +23,14 @@ namespace ClockInSync.Repositories.Repositories
 
         Task<UserLoginInformationResponse?> GetUserByEmailAsync(string email);
 
-        Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync();
+        Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync(int offset, int limit);
 
         Task<UserLoginInformationResponse?> VerifyUserLoginAsync(User login);
 
         Task<bool> VerifyUserExistsByEmailAsync(string email);
+
+        public Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId);
+
     }
 
     public class UserRepository(ClockInSyncDbContext dbContext) : IUserRepository
@@ -73,17 +79,25 @@ namespace ClockInSync.Repositories.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync()
+        public async Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync(int offset, int limit)
         {
             return await dbContext.Users
+        .Skip(offset)
         .Select(u => new UserInformationResponse
         {
             Id = u.Id,
             Email = u.Email,
             Name = u.Name,
-            Settings = new Dtos.Settings.SettingsDto { OvertimeRate = u.Settings.OvertimeRate, WorkdayHours = u.Settings.WorkdayHours }
+            Settings = new Dtos.Settings.SettingsDto
+            {
+                OvertimeRate = u.Settings.OvertimeRate,
+                WorkdayHours = u.Settings.WorkdayHours,
+                WeeklyJourney = u.Settings.WeeklyJourney,
+            }
         })
         .ToListAsync();
+
+
         }
 
         public async Task<UserInformationResponse?> UpdateUserAsync(User user)
@@ -122,5 +136,68 @@ namespace ClockInSync.Repositories.Repositories
         {
             return await dbContext.Users.AnyAsync(p => p.Email == email);
         }
+
+        public async Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId)
+        {
+            var userFound = await dbContext.Users.AnyAsync(u => u.Id == userId);
+
+            if (!userFound)
+                return null;
+
+            var userDetails = await dbContext.Users
+    .Where(u => u.Id == userId)
+    .Select(u => new UserAllDetailsResponse
+    {
+        Id = u.Id,
+        Name = u.Name,
+        Email = u.Email,
+        Role = u.Role,
+        Settings = new SettingsDto
+        {
+            WorkdayHours = u.Settings.WorkdayHours,
+            OvertimeRate = u.Settings.OvertimeRate,
+            WeeklyJourney = u.Settings.WeeklyJourney
+        },
+        Registers = dbContext.PunchClocks
+            .Where(p => p.UserId == u.Id)
+            .GroupBy(p => new { p.UserId, p.Timestamp.Date })
+            .Select(g => new Registers
+            {
+                Date = g.Key.Date,
+                CheckIns = g.Where(x => x.Type == PunchType.CheckIn)
+                            .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
+                            .ToList(),
+                CheckOuts = g.Where(x => x.Type == PunchType.CheckOut)
+                             .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
+                             .ToList(),
+            })
+            .ToList()
+    })
+    .FirstOrDefaultAsync();
+
+            if (userDetails != null)
+            {
+                decimal totalHoursWorked = 0;
+                foreach (var register in userDetails.Registers)
+                {
+                    foreach (var checkIn in register.CheckIns)
+                    {
+                        var checkOut = register.CheckOuts.FirstOrDefault(co => co.Timestamp.Date == checkIn.Timestamp.Date);
+                        if (checkOut != null)
+                        {
+                            totalHoursWorked += (decimal)(checkOut.Timestamp - checkIn.Timestamp).TotalHours;
+                        }
+                    }
+                }
+                userDetails.HoursWorked = totalHoursWorked.ToString("F2");
+            }
+
+            return userDetails;
+
+
+        }
+
+
+
     }
 }

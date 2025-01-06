@@ -12,6 +12,5 @@ namespace ClockInSync.Repositories.Dtos.User.UserResponse
         public SettingsDto Settings { get; set; }
 
 
-
     }
 }

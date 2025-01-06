@@ -17,6 +17,7 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
         public Task<IEnumerable<PunchClockAll>> GetAllPunchClock(Guid? userId,DateTime? startDate, DateTime? endDate);
 
         public Task<ExportPunchClockAll> ExportAllPunchClocks(DateTime? startDate, DateTime? endDate);
+
     }
 
     public class PunchClockRepository(ClockInSyncDbContext dbContext) : IPunchClockRepository

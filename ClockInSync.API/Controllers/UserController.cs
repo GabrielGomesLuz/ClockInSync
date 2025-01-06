@@ -2,6 +2,7 @@
 using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClockInSync.API.Controllers
 {
@@ -41,11 +42,23 @@ namespace ClockInSync.API.Controllers
                 var passwordMatch = await userService.LoginUserAsync(userLoginDto);
                 if (passwordMatch != null)
                     return Ok(passwordMatch);
-                return BadRequest("Senha inválida.");
+                return BadRequest(new { message = "Senha inválida" });
 
             }
 
-            return BadRequest("Email não cadastrado no sistema.");
+            return BadRequest(new { message = "Email não cadastrado no sistema." });
+        }
+
+        [HttpGet("users")]
+        public async Task<ActionResult> GetAllUsers([FromQuery] int offset, [FromQuery] int limit)
+        {
+            return Ok(await userService.GetUsersInformationAsync(offset, limit));
+        }
+
+        [HttpGet("user/infos")]
+        public async Task<ActionResult> GetAllInfosUser([Required][FromHeader] Guid userId)
+        {
+            return Ok(await userService.GetUserAllDetails(userId));
         }
     }
 }
