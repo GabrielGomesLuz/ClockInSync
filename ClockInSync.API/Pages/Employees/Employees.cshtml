@@ -28,84 +28,94 @@
             <tbody id="user-list">
             </tbody>
         </table>
+        <nav aria-label="Page navigation example" id="pagination">
+
+        </nav>
     </section>
 
 
     <script>
 
-
-                document.addEventListener("DOMContentLoaded", function() {
-            // Função para obter o token JWT do localStorage
+        let offset = 0
+        const limit = 10
+                function loadUsers(offset = 0, limit = 10) {
             const token = localStorage.getItem('jwt');
 
-            // Se o token não estiver presente, redirecione ou exiba uma mensagem de erro
             if (!token) {
                 console.log('Usuário não autenticado. Redirecionando para o login...');
-                window.location.href = '/login';  // Redirecionar para a página de login (ou outro comportamento)
+                window.location.href = '/login';
                 return;
             }
 
-            // Fazer uma requisição GET para a API de Funcionários
-            fetch('/api/User/v1/users?offset=0&limit=10', {
+            fetch(`/api/User/v1/users?offset=${offset}&limit=${limit}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`  // Incluir o token JWT no cabeçalho Authorization
+                    'Authorization': `Bearer ${token}`
                 }
             })
             .then(response => {
                 if (!response.ok) {
-                    // Se a resposta não for ok (erro), você pode lidar com isso de acordo
                     return response.json().then(errorData => {
                         console.error('Erro:', errorData);
                         alert('Erro ao carregar os funcionários. Você pode ser deslogado.');
-                        // Possivelmente redirecionar para o login se o token for inválido ou expirado
                     });
                 }
-                return response.json(); // Caso a resposta seja bem-sucedida, converta para JSON
+                return response.json();
             })
             .then(data => {
-        const funcionarioList = document.getElementById('user-list');
+                const funcionarioList = document.getElementById('user-list');
 
-        // Limpar o conteúdo anterior, se necessário
-        funcionarioList.innerHTML = '';
+                data.forEach(funcionario => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td scope="row" style="width: 0;">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="First group">
+                                <a href="/funcionario/${funcionario.id}/detalhes" role="button" class="btn btn-acao">
+                                    <i class="bi bi-info-square"></i>
+                                </a>
+                                <a href="/funcionario/editar" role="button" class="btn btn-acao">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="align-items-center">
+                                <p class="fw-bold mb-1" id="userName">${funcionario.name}</p>
+                                <p class="text-muted mb-0" id="userEmail">${funcionario.email}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="fw-normal mb-1">Software engineer</p>
+                            <p class="text-muted mb-0">IT department</p>
+                        </td>
+                        <td>Senior</td>
+                    `;
+                    funcionarioList.appendChild(row);
+                });
 
-        // Iterar sobre os funcionários e adicionar cada um ao corpo da tabela
-        data.forEach(funcionario => {
-            // Criar uma nova linha (tr)
-            const row = document.createElement('tr');
+                const loadMoreButton = document.getElementById('pagination');
 
-            row.innerHTML = `
-                <td scope="row" style="width: 0;">
-                    <div class="btn-group btn-group-sm" role="group" aria-label="First group">
-                        <a href="/funcionario/${funcionario.id}/detalhes" role="button" class="btn btn-acao">
-                            <i class="bi bi-info-square"></i>
-                        </a>
-                        <a href="/funcionario/editar" role="button" class="btn btn-acao">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                    </div>
-                </td>
-                <td>
-                    <div class="align-items-center">
-                        <p class="fw-bold mb-1" id="userName">${funcionario.name}</p>
-                        <p class="text-muted mb-0" id="userEmail">${funcionario.email}</p>
-                    </div>
-                </td>
-                <td>
-                    <p class="fw-normal mb-1">Software engineer</p>
-                    <p class="text-muted mb-0">IT department</p>
-                </td>
-                <td>Senior</td>
-            `;
-
-            // Adicionar a linha à tabela
-            funcionarioList.appendChild(row);
-        });
+                // Verificar se o botão "Carregar mais" já existe e removê-lo
+                loadMoreButton.innerHTML = '';
+                console.log(data.length);
+                if (data.length === limit) {
+                    loadMoreButton.innerHTML = `
+                        <ul class="pagination" style="padding:0.5rem;">
+                            <li class="page-item">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="loadUsers(${offset + limit}, ${limit})">Carregar mais...</button>
+                            </li>
+                        </ul>
+                    `;
+                }
             })
             .catch(error => {
                 console.error('Erro ao buscar os dados dos funcionários:', error);
             });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadUsers(offset, limit); // Chama a função com o offset inicial de 0
         });
 
     </script>
