@@ -12,6 +12,8 @@ namespace ClockInSync.Repositories.Dtos.User.UserResponse
 
         public string Position { get; set; } = string.Empty;
 
+        public string Level { get; set; } = string.Empty;
+
         public SettingsDto Settings { get; set; }
 
 

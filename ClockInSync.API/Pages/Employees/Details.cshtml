@@ -87,23 +87,27 @@
                             <div class="text-muted">
                                 <p class="text-sm">
                                     Nome do funcionário:
-                                    <b class="d-block" id="dataUserName">Deveint Inc</b>
+                                    <b class="d-block" id="dataUserName"></b>
                                 </p>
                                 <p class="text-sm">
                                     Jornada de trabalho semanal:
-                                    <b class="d-block" id="dataWeeklyJourney">Tony Chicken</b>
+                                    <b class="d-block" id="dataWeeklyJourney"></b>
                                 </p>
                                 <p class="text-sm">
                                     Tipo de usuário:
-                                    <b class="d-block" id="dataRole">Employee</b>
+                                    <b class="d-block" id="dataRole"></b>
                                 </p>
                                 <p class="text-sm">
                                     Cargo:
-                                    <b class="d-block" id="dataPosition">Developtment</b>
+                                    <b class="d-block" id="dataPosition"></b>
                                 </p>
                                 <p class="text-sm">
                                     Setor:
-                                    <b class="d-block" id="dataDepartment">IT</b>
+                                    <b class="d-block" id="dataDepartment"></b>
+                                </p>
+                                <p class="text-sm">
+                                    Nível:
+                                    <b class="d-block" id="dataLevel"></b>
                                 </p>
                             </div>
                         </div>
@@ -184,6 +188,19 @@
                     <span class="info-box-number text-center text-muted mb-0">${data.settings.weeklyJourney}h</span>
                 `;
 
+                if(data.registers.length == 0){
+                    const newHtml = `
+                        <div class="col-12" style="padding-top:0.5rem;">
+                            <div class="info-box bg-light">
+                                <div class="info-box-content" id="noRecentPunchs">
+                                    <span class="info-box-text text-left text-muted">Sem registros recentes</span>
+
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        container.innerHTML += newHtml;
+                }
 
                 data.registers.forEach(register => {
                                     
@@ -279,6 +296,8 @@
                 document.getElementById('dataRole').textContent = data.role;
                 document.getElementById('dataDepartment').textContent = data.department;
                 document.getElementById('dataPosition').textContent = data.position;
+                document.getElementById('dataLevel').textContent = data.level;
+                
 
             })
             .catch(error => {

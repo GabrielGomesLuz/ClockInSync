@@ -29,6 +29,10 @@ namespace ClockInSync.Repositories.Dtos.User
         public string Position {  get; set; } = string.Empty;
 
         [Required]
+        [StringLength(20)]
+        public string Level {  get; set; }
+
+        [Required]
         public SettingsDto Settings { get; set; }
 
 

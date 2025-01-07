@@ -62,6 +62,10 @@
                                 <label for="inputProjectLeader">Cargo</label>
                                 <input type="text" id="inputPosition" class="form-control">
                             </div>
+                            <div class="form-group">
+                                <label for="inputProjectLeader">Nível</label>
+                                <input type="text" id="inputLevel" class="form-control">
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -147,6 +151,8 @@
                 const inputRole = document.getElementById('inputRole').value = data.role;
                 const inputDepartment = document.getElementById('inputDepartment').value = data.department;
                 const inputPosition = document.getElementById('inputPosition').value = data.position;
+                const inputPosition = document.getElementById('inputLevel').value = data.level;
+                
 
                 const inputDailyJourney = document.getElementById('inputDailyJourney').value = data.settings.workdayHours;
                 const inputWeeklyJourney = document.getElementById('inputWeeklyJourney').value = data.settings.weeklyJourney;

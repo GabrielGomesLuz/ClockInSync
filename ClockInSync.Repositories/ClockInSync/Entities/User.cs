@@ -33,6 +33,10 @@ namespace ClockInSync.Repositories.Entities
         [StringLength(40)]
         public string Department { get; set; } = string.Empty;
 
+        [Required]
+        [StringLength(20)]
+        public string Level { get; set; } = string.Empty;
+
         // Chave estrangeira para a tabela Settings
 
         public Guid SettingsId { get; set; }

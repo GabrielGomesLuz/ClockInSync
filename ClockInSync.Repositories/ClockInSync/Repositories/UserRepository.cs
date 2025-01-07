@@ -93,6 +93,7 @@ namespace ClockInSync.Repositories.Repositories
             Name = u.Name,
             Department = u.Department,
             Position = u.Position,
+            Level = u.Level,
             Settings = new Dtos.Settings.SettingsDto
             {
                 OvertimeRate = u.Settings.OvertimeRate,
@@ -177,6 +178,7 @@ namespace ClockInSync.Repositories.Repositories
         Role = u.Role,
         Department = u.Department,
         Position = u.Position,
+        Level = u.Level,
         Settings = new SettingsDto
         {
             WorkdayHours = u.Settings.WorkdayHours,
@@ -239,6 +241,7 @@ namespace ClockInSync.Repositories.Repositories
         Department = u.Department,
         Position = u.Position,
         Role = u.Role,
+        Level = u.Level,
         Settings = new SettingsDto
         {
             WorkdayHours = u.Settings.WorkdayHours,
