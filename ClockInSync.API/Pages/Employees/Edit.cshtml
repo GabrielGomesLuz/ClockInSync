@@ -1,0 +1,209 @@
+﻿@page "/funcionario/editar/{id:guid}"
+
+@{
+    Layout = "_Layout";
+}
+
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar funcionário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0" />
+</head>
+<body>
+
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Editar Funcionário</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Editar funcionário</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <section class="content">
+        <form id="postEdit">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Dados</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputName">Nome</label>
+                                <input type="text" id="inputName" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputDescription">Email</label>
+                                <input type="text" id="inputEmail" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputType">Tipo de usuário</label>
+                                <input type="text" disabled id="inputRole" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputClientCompany">Departamento</label>
+                                <input type="text" id="inputDepartment" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputProjectLeader">Cargo</label>
+                                <input type="text" id="inputPosition" class="form-control">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title">Configurações</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputWeeklyJourney">Jornada Semanal</label>
+                                <input type="number" id="inputWeeklyJourney" class="form-control" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputDailyJourney">Jornada diária</label>
+                                <input type="number" id="inputDailyJourney" class="form-control" step="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="inputTaxOvertimeHours">Taxa de horas extras</label>
+                                <input type="number" id="inputTaxOvertimeHours" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <a href="#" class="btn btn-secondary">Cancelar</a>
+                    <input type="submit" value="Salvar" class="btn btn-success float-right">
+                </div>
+            </div>
+        </form>
+        
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Função para obter o token JWT do localStorage
+            const token = localStorage.getItem('jwt');
+
+            const path = window.location.pathname;
+            const pathParts = path.split('/');
+            const userId = pathParts[3];  // O valor será '1234'
+            console.log(userId);
+
+            // Se o token não estiver presente, redirecione ou exiba uma mensagem de erro
+            if (!token) {
+                console.log('Usuário não autenticado. Redirecionando para o login...');
+                window.location.href = '/login';  // Redirecionar para a página de login (ou outro comportamento)
+                return;
+            }
+
+            // Fazer uma requisição GET para a API de Funcionários
+            fetch('/api/User/v1/user/edit/infos', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'userId': userId // Incluir o userId no cabeçalho
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Se a resposta não for ok (erro), você pode lidar com isso de acordo
+                    return response.json().then(errorData => {
+                        console.error('Erro:', errorData);
+                        alert('Erro ao carregar os funcionários.');
+                    });
+                }
+                return response.json(); // Caso a resposta seja bem-sucedida, converta para JSON
+            })
+            .then(data => {
+                
+                const inputName = document.getElementById('inputName').value = data.name;
+                const inputEmail = document.getElementById('inputEmail').value = data.email;
+                const inputRole = document.getElementById('inputRole').value = data.role;
+                const inputDepartment = document.getElementById('inputDepartment').value = data.department;
+                const inputPosition = document.getElementById('inputPosition').value = data.position;
+
+                const inputDailyJourney = document.getElementById('inputDailyJourney').value = data.settings.workdayHours;
+                const inputWeeklyJourney = document.getElementById('inputWeeklyJourney').value = data.settings.weeklyJourney;
+                const inputTaxOvertimeHours = document.getElementById('inputTaxOvertimeHours').value = data.settings.overtimeRate;
+
+            })
+            .catch(error => {
+                console.error('Erro ao buscar os dados dos funcionários:', error);
+            });
+        });
+
+
+                        document.getElementById('postEdit').addEventListener('submit', function(event) {
+            event.preventDefault();  // Impede o comportamento padrão do form
+            const token = localStorage.getItem('jwt');
+            const path = window.location.pathname;
+            const pathParts = path.split('/');
+            const userId = pathParts[3];
+            const formData = new FormData(this);  // Obtém os dados do formulário
+
+            fetch('/api/User/v1/put/user/edit', {
+                method: 'PUT',  // Usando PUT para atualizar o recurso
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id: userId,
+                    name: document.getElementById('inputName').value,
+                    email: document.getElementById('inputEmail').value,
+                    role: document.getElementById('inputRole').value,
+                    department: document.getElementById('inputDepartment').value,
+                    position: document.getElementById('inputPosition').value,
+                    settings: {
+                        workdayHours: document.getElementById('inputDailyJourney').value,
+                        weeklyJourney: document.getElementById('inputWeeklyJourney').value,
+                        overtimeRate: document.getElementById('inputTaxOvertimeHours').value
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                    Swal.fire({
+            title: 'Sucesso!',
+            text: 'Dados atualizados com sucesso!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+        }).then(() => {
+            window.location.href = '/funcionarios'; // Redirecionamento após o sucesso
+        });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });  // Fechamento do evento
+
+
+    </script>
+</body>
+</html>

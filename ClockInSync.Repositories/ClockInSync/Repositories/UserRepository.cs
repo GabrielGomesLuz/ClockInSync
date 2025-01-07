@@ -7,6 +7,7 @@ using ClockInSync.Repositories.Entities;
 using ClockInSync.Repositories.PasswordManagementHelper;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using static ClockInSync.Repositories.Entities.PunchClock;
 
 namespace ClockInSync.Repositories.Repositories
@@ -16,7 +17,7 @@ namespace ClockInSync.Repositories.Repositories
     {
         Task<UserRegisterResponse> CreateUserAsync(User user);
 
-        Task<UserInformationResponse?> UpdateUserAsync(User user);
+        Task<string?> UpdateUserAsync(User user);
 
 
         Task<bool> DeleteUserAsync(Guid userId);
@@ -30,6 +31,8 @@ namespace ClockInSync.Repositories.Repositories
         Task<bool> VerifyUserExistsByEmailAsync(string email);
 
         public Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId);
+
+        public Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId);
 
     }
 
@@ -88,6 +91,8 @@ namespace ClockInSync.Repositories.Repositories
             Id = u.Id,
             Email = u.Email,
             Name = u.Name,
+            Department = u.Department,
+            Position = u.Position,
             Settings = new Dtos.Settings.SettingsDto
             {
                 OvertimeRate = u.Settings.OvertimeRate,
@@ -100,21 +105,39 @@ namespace ClockInSync.Repositories.Repositories
 
         }
 
-        public async Task<UserInformationResponse?> UpdateUserAsync(User user)
+        public async Task<string?> UpdateUserAsync(User user)
         {
-            if (user != null)
+
+            var userFound = await VerifyUserExistsById(user.Id);
+            if (userFound)
             {
+                var userOld = await GetUserCredentialsByIdAsync(user.Id);
+                user.Password = userOld.UserPassword;
                 dbContext.Users.Update(user);
                 await dbContext.SaveChangesAsync();
-                return new UserInformationResponse
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Name = user.Name
-                };
+                return "Dados atualizados com sucesso.";
             }
-            return null;
+            return "Usuário não existe.";
         }
+
+
+        private async Task<UserCredentialsResponse> GetUserCredentialsByIdAsync(Guid userId)
+        {
+            var userData = await dbContext.Users.Where(u => u.Id == userId).Select(u => new UserCredentialsResponse
+            {
+                UserName = u.Name,
+                UserPassword = u.Password,
+            }).FirstOrDefaultAsync();
+
+            return userData;
+        }
+        private async Task<bool> VerifyUserExistsById(Guid userId)
+        {
+
+            return await dbContext.Users.AnyAsync(u => u.Id == userId);
+
+        }
+
 
         public async Task<UserLoginInformationResponse?> VerifyUserLoginAsync(User login)
         {
@@ -152,6 +175,8 @@ namespace ClockInSync.Repositories.Repositories
         Name = u.Name,
         Email = u.Email,
         Role = u.Role,
+        Department = u.Department,
+        Position = u.Position,
         Settings = new SettingsDto
         {
             WorkdayHours = u.Settings.WorkdayHours,
@@ -197,7 +222,36 @@ namespace ClockInSync.Repositories.Repositories
 
         }
 
+        public async Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId)
+        {
+            var userFound = await dbContext.Users.AnyAsync(u => u.Id == userId);
 
+            if (!userFound)
+                return null;
+
+            var userEditDetails = await dbContext.Users
+    .Where(u => u.Id == userId)
+    .Select(u => new UserInfoToEditResponse
+    {
+        Id = u.Id,
+        Name = u.Name,
+        Email = u.Email,
+        Department = u.Department,
+        Position = u.Position,
+        Role = u.Role,
+        Settings = new SettingsDto
+        {
+            WorkdayHours = u.Settings.WorkdayHours,
+            OvertimeRate = u.Settings.OvertimeRate,
+            WeeklyJourney = u.Settings.WeeklyJourney
+        },
+    })
+    .FirstOrDefaultAsync();
+
+            return userEditDetails;
+
+
+        }
 
     }
 }

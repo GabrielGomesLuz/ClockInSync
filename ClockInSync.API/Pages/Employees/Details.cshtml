@@ -99,7 +99,7 @@
                                 </p>
                                 <p class="text-sm">
                                     Cargo:
-                                    <b class="d-block" id="dataDivision">Developtment</b>
+                                    <b class="d-block" id="dataPosition">Developtment</b>
                                 </p>
                                 <p class="text-sm">
                                     Setor:
@@ -277,6 +277,8 @@
                 document.getElementById('dataUserName').textContent = data.name;
                 document.getElementById('dataWeeklyJourney').textContent = data.hoursWorked;
                 document.getElementById('dataRole').textContent = data.role;
+                document.getElementById('dataDepartment').textContent = data.department;
+                document.getElementById('dataPosition').textContent = data.position;
 
             })
             .catch(error => {

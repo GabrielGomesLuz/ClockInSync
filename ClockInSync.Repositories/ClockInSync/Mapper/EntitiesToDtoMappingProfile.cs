@@ -22,5 +22,13 @@ public class EntitiesToDtoMappingProfile : Profile
         CreateMap<RegisterPunchClock, PunchClock>();
 
         CreateMap<UserLoginInformationResponse, User>();
+
+        CreateMap<UserEditDto, User>()
+        .ForMember(dest => dest.Settings, opt => opt.MapFrom(src => new Settings
+        {
+            WorkdayHours = src.Settings.WorkdayHours,
+            OvertimeRate = src.Settings.OvertimeRate,
+            WeeklyJourney = src.Settings.WeeklyJourney,
+        })); ;
     }
 }

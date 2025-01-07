@@ -60,5 +60,26 @@ namespace ClockInSync.API.Controllers
         {
             return Ok(await userService.GetUserAllDetails(userId));
         }
+
+        [HttpPut("put/user/edit")]
+        public async Task<ActionResult> PutUser([FromBody]UserEditDto userEditDto)
+        {
+            if(userEditDto == null)
+                return BadRequest("Ocorreu um erro ao atualizar os dados");
+
+            var message = await userService.UpdateUserAsync(userEditDto);
+                
+            return Ok(new { message });
+
+
+
+        }
+
+        [HttpGet("user/edit/infos")]
+        public async Task<ActionResult> GetInfoToEditUser([FromHeader] Guid userId)
+        {
+            return Ok(await userService.GetUserInfoToEditAsync(userId));
+        }
+       
     }
 }

@@ -21,6 +21,11 @@ namespace ClockInSync.Services
         Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync(int offset, int limit);
 
          Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId);
+
+
+        public Task<string?> UpdateUserAsync(UserEditDto userEditDto);
+
+        public Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId);
     }
 
 
@@ -54,6 +59,11 @@ namespace ClockInSync.Services
             return await userRepository.GetUserAllDetails(userId);
         }
 
+        public async Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId)
+        {
+            return await userRepository.GetUserInfoToEditAsync(userId);
+        }
+
         public async Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync(int offset, int limit)
         {
             return await userRepository.GetUsersInformationAsync(offset, limit);
@@ -72,6 +82,14 @@ namespace ClockInSync.Services
 
             }
             return null;
+        }
+
+        public async Task<string?> UpdateUserAsync(UserEditDto userEditDto)
+        {
+            var user = mapper.Map<User>(userEditDto);
+
+            return await userRepository.UpdateUserAsync(user);
+
         }
 
         public async Task<bool> VerifyUserExistsByEmailAsync(string email)
