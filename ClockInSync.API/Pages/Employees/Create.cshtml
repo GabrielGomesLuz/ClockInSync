@@ -45,11 +45,13 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputName">Nome</label>
-                                <input type="text" id="inputName" class="form-control">
+                                <input type="text" required="true" id="inputName" class="form-control">
+                                <p id="inputNameError"></p>
                             </div>
                             <div class="form-group">
                                 <label for="inputEmail">Email</label>
-                                <input type="text" id="inputEmail" class="form-control">
+                                <input type="email" required="true" id="inputEmail" class="form-control">
+                                <p id="inputEmailError"></p>
                             </div>
                             <div class="form-group">
                                 <label for="inputRole">Tipo de usúario</label>
@@ -61,16 +63,19 @@
                             </div>
                             <div class="form-group">
                                 <label for="inputPassword">Senha</label>
-                                <input type="password" id="inputPassword" class="form-control">
+                                <input type="password" required="true" id="inputPassword" class="form-control">
+                                <p id="inputPasswordError"></p>
                             </div>
                             <div class="form-group">
                                 <label for="inputDepartment">Departamento</label>
-                                <input type="text" id="inputDepartment" class="form-control">
+                                <input type="text" required="true" id="inputDepartment" class="form-control">
+                                <p id="inputDepartmentError"></p>
                             </div>
 
                             <div class="form-group">
                                 <label for="inputLevel">Nível</label>
-                                <input type="text" id="inputLevel" class="form-control">
+                                <input type="text" required="true" id="inputLevel" class="form-control">
+                                <p id="inputLevelError"></p>
                             </div>
 
                         </div>
@@ -86,15 +91,18 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="inputWeeklyJourney">Jornada Semanal</label>
-                                <input type="number" id="inputWeeklyJourney" class="form-control" step="1">
+                                <input type="number" required="true" id="inputWeeklyJourney" class="form-control" step="1">
+                                <p id="inputWeeklyJourneyError"></p>
                             </div>
                             <div class="form-group">
                                 <label for="inputDailyJourney">Jornada diária</label>
-                                <input type="number" id="inputDailyJourney" class="form-control" step="1">
+                                <input type="number" required="true" id="inputDailyJourney" class="form-control" step="1">
+                                <p id="inputDailyJourneyError"></p>
                             </div>
                             <div class="form-group">
                                 <label for="inputTaxOvertimeHours">Taxa de horas extras</label>
-                                <input type="number" id="inputTaxOvertimeHours" class="form-control" step="0.1">
+                                <input type="number" required="true" id="inputTaxOvertimeHours" class="form-control" step="0.1">
+                                <p id="inputTaxOvertimeHoursError"></p>
                             </div>
                         </div>
                         <!-- /.card-body -->
@@ -114,50 +122,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-            document.getElementById('postNewEmployee').addEventListener('submit', function(event) {
-            event.preventDefault();  // Impede o comportamento padrão do form
-            const token = localStorage.getItem('jwt');
-
-            const formData = new FormData(this);  // Obtém os dados do formulário
-
-            fetch('/api/User/v1/register', {
-                method: 'POST',  // Usando PUT para atualizar o recurso
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: document.getElementById('inputName').value,
-                    email: document.getElementById('inputEmail').value,
-                    password: document.getElementById('inputPassword').value,
-                    role: document.getElementById('inputRole').value,
-                    department: document.getElementById('inputDepartment').value,
-                    position: document.getElementById('inputPosition').value,
-                    level:  document.getElementById('inputLevel').value,
-                    settings: {
-                        workdayHours: document.getElementById('inputDailyJourney').value,
-                        weeklyJourney: document.getElementById('inputWeeklyJourney').value,
-                        overtimeRate: document.getElementById('inputTaxOvertimeHours').value
-                    }
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                    Swal.fire({
-            title: 'Sucesso!',
-            text: 'Dados registrados com sucesso!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-        }).then(() => {
-            window.location.href = '/funcionarios'; // Redirecionamento após o sucesso
-        });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });  // Fechamento do evento
-    </script>
+    <script src="~/js/createEmployee.js"></script>
 
 
 </body>

@@ -13,7 +13,9 @@ namespace ClockInSync.Repositories.Dtos.User
 
         public string Position { get; set; } = string.Empty;
 
-        public SettingsDto Settings { get; set; }
+        public string Level {get; set;} = string.Empty;
+
+        public SettingsDto Settings { get; set; } = new();
 
     }
 }
