@@ -1,0 +1,115 @@
+﻿@page
+
+@{
+    Layout = "_Layout";
+}
+
+@{
+    ViewData["Title"] = "Login ClockInSync";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar funcionário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0" />
+</head>
+<body>
+
+    <div class="content-wrapper" style="margin-left:0">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Registrar Ponto</h1>
+                    </div>                   
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+
+    <section class="content">
+
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <p style="text-align:center;"><b>Jornada Semanal</b></p>
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content" id="boxHoursWorked">
+                                            <p style="text-align: center;">8h</p>
+                                        </div>                               
+                                    </div>                                
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <p style="text-align:center;"><b>Jornada Diária</b></p>
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content" id="boxDailyJourney">
+                                            <p style="text-align: center;">8h</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <p style="text-align:center;"><b>Jornada Mensal</b></p>
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content" id="boxWeeklyJourney">
+                                            <p style="text-align: center;">8h</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="infoPunchClockRow">
+                                
+                                <div class="card text-center">
+                    <div style="padding: 0.8rem;">
+                        <img src="https://www.svgrepo.com/show/105517/user-icon.svg" style="width: 10%;">
+                       
+                            <p style="margin-top: 0.5rem;"><b>Gabriel Gomes Luz</b></p>
+                            <p><b>Estagiário</b></p>
+
+                        
+                        <button type="button" class="btn btn-success" style="border-radius: 20px;">Bater ponto</button>
+                    </div>
+                </div>
+                            </div>
+
+                            <div class="row" id="infoPunchClockRow">
+                                <h4>Registros recentes:</h4>
+                                
+                            </div>
+                        </div>                       
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+        </section>
+    </div>
+
+
+
+
+
+</body>
+</html>
+
