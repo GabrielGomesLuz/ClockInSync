@@ -3,13 +3,14 @@ using ClockInSync.Repositories.ClockInSync.Repositories;
 using ClockInSync.Repositories.Dtos.PunchClock;
 using ClockInSync.Repositories.Entities;
 using System.Text;
+using static ClockInSync.Repositories.Entities.PunchClock;
 
 namespace ClockInSync.Services.PunchClockServices
 {
 
     public interface IPunchClockService
     {
-        Task<bool> RegisterPunchClock(RegisterPunchClock registerPunchClock, Guid userId);
+        Task<bool> RegisterPunchClock(Guid userId);
         Task<IEnumerable<PunchClockSummary>> GetPunchClockSummaries(Guid userId);
         public Task<IEnumerable<PunchClockAll>> GetPunchClockAll(Guid? userId, DateTime? startDate, DateTime? endDate);
         public Task<byte[]> ExportPunchClockAll(DateTime? startDate, DateTime? endDate);
@@ -47,8 +48,27 @@ namespace ClockInSync.Services.PunchClockServices
             return await punchClockRepository.GetPunchClockSummaries(userId);
         }
 
-        public async Task<bool> RegisterPunchClock(RegisterPunchClock registerPunchClock, Guid userId)
+        public async Task<bool> RegisterPunchClock(Guid userId)
         {
+            var lastPunchClockType = await punchClockRepository.GetPunchClockPrevious(userId);
+            ClockInSync.Repositories.Dtos.PunchClock.RegisterPunchClock registerPunchClock = new();
+            if (lastPunchClockType == null)
+            {
+                registerPunchClock.Type = PunchType.CheckIn;
+            }
+            else
+            {
+                switch (lastPunchClockType)
+                {
+                    case PunchType.CheckIn: 
+                        registerPunchClock.Type = PunchType.CheckOut;
+                        break;
+                    case PunchType.CheckOut:
+                        registerPunchClock.Type = PunchType.CheckIn;
+                        break;
+                }
+            }
+                
             var punchClock = mapper.Map<PunchClock>(registerPunchClock);
 
             punchClock.UserId = userId;

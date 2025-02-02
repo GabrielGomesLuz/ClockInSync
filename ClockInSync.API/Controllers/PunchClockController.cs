@@ -14,21 +14,17 @@ namespace ClockInSync.API.Controllers
     public class PunchClockController(IPunchClockService _clockService) : Controller
     {
         [HttpPost("punch-clock")]
-        public async Task<ActionResult> RegisterPunchClock(RegisterPunchClock registerPunchClock)
+        public async Task<ActionResult> RegisterPunchClock()
         {
-
-            if (registerPunchClock == null)
-                return BadRequest("Dados inválidos.");
-
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return NotFound("User não encontrado.");
-            var isSucess = await _clockService.RegisterPunchClock(registerPunchClock, Guid.Parse(userId!));
+            var isSucess = await _clockService.RegisterPunchClock(Guid.Parse(userId!));
 
             if(isSucess)
-                return Ok(new PunchClockResponse { Message = "Ponto registrado com sucesso",TimeStamp = DateTime.Now});
+                return Ok(new PunchClockResponse { Message = "Ponto registrado com sucesso"});
 
             return BadRequest("Não foi possível registrar o seu ponto.");
 

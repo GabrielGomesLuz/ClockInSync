@@ -18,6 +18,8 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
 
         public Task<ExportPunchClockAll> ExportAllPunchClocks(DateTime? startDate, DateTime? endDate);
 
+        public Task<PunchType?> GetPunchClockPrevious(Guid userId);
+
     }
 
     public class PunchClockRepository(ClockInSyncDbContext dbContext) : IPunchClockRepository
@@ -215,6 +217,19 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
 
         }
 
+        public async Task<PunchType?> GetPunchClockPrevious(Guid userId)
+        {
+            var punchClocks = await dbContext.PunchClocks.OrderByDescending(x => x.UserId).FirstOrDefaultAsync();
+            if (punchClocks != null)
+            {
+                var result = new RegisterPunchClock
+                {
+                    Type = punchClocks.Type,
+                };
+                return result.Type;
+            }
 
+            return null;
+        }
     }
 }
