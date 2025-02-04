@@ -33,14 +33,14 @@ namespace ClockInSync.API.Controllers
 
 
         [HttpGet("history")]
-        public async Task<ActionResult> GetHystoryPunchClocks()
+        public async Task<ActionResult> GetHystoryPunchClocks([FromQuery] int limit)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return BadRequest("User não encontrado.");
 
-            var punchClocksSummaries = await _clockService.GetPunchClockSummaries(Guid.Parse(userId));
+            var punchClocksSummaries = await _clockService.GetPunchClockSummaries(Guid.Parse(userId),limit);
             return Ok(punchClocksSummaries);
         }
 

@@ -3,6 +3,7 @@ using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace ClockInSync.API.Controllers
 {
@@ -55,10 +56,19 @@ namespace ClockInSync.API.Controllers
             return Ok(await userService.GetUsersInformationAsync(offset, limit));
         }
 
-        [HttpGet("user/infos")]
+        [HttpGet("users/infos")]
         public async Task<ActionResult> GetAllInfosUser([Required][FromHeader] Guid userId)
         {
             return Ok(await userService.GetUserAllDetails(userId));
+        }
+
+        [HttpGet("user/info")]
+        public async Task<ActionResult> GetInfoUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return NotFound("Usuário inválido.");
+            return Ok(await userService.GetUserInformation(Guid.Parse(userId)));
         }
 
         [HttpPut("put/user/edit")]

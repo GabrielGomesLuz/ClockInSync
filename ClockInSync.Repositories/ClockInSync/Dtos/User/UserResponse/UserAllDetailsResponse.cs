@@ -21,12 +21,11 @@ namespace ClockInSync.Repositories.Dtos.User.UserResponse
         public List<PunchDetail> CheckOuts { get; set; } = [];
         public DateTime Date { get; set; }
 
-        public string Message {  get; set; } = string.Empty;
     }
 
     public class PunchDetail
     {
-        public DateTime Timestamp { get; set; }
+        public DateTime? Timestamp { get; set; }
         public string Message { get; set; } = string.Empty;
     }
 }

@@ -22,6 +22,8 @@ namespace ClockInSync.Services
 
          Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId);
 
+        Task<UserInformationResponse?> GetUserInformation(Guid userId);
+
 
         public Task<string?> UpdateUserAsync(UserEditDto userEditDto);
 
@@ -57,6 +59,11 @@ namespace ClockInSync.Services
         public async Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId)
         {
             return await userRepository.GetUserAllDetails(userId);
+        }
+
+        public async Task<UserInformationResponse?> GetUserInformation(Guid userId)
+        {
+            return await userRepository.GetUserBasicInfoAsync(userId);
         }
 
         public async Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId)

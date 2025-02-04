@@ -34,6 +34,8 @@ namespace ClockInSync.Repositories.Repositories
 
         public Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId);
 
+        Task<UserInformationResponse?> GetUserBasicInfoAsync(Guid userId);
+
     }
 
     public class UserRepository(ClockInSyncDbContext dbContext) : IUserRepository
@@ -187,7 +189,7 @@ namespace ClockInSync.Repositories.Repositories
         },
         Registers = dbContext.PunchClocks
             .Where(p => p.UserId == u.Id)
-            .GroupBy(p => new { p.UserId, p.Timestamp.Date })
+            .GroupBy(p => new { p.UserId, p.Timestamp!.Value.Date })
             .Select(g => new Registers
             {
                 Date = g.Key.Date,
@@ -198,6 +200,7 @@ namespace ClockInSync.Repositories.Repositories
                              .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
                              .ToList(),
             })
+            .OrderByDescending(r => r.Date)
             .ToList()
     })
     .FirstOrDefaultAsync();
@@ -209,13 +212,21 @@ namespace ClockInSync.Repositories.Repositories
                 {
                     foreach (var checkIn in register.CheckIns)
                     {
-                        var checkOut = register.CheckOuts.FirstOrDefault(co => co.Timestamp.Date == checkIn.Timestamp.Date);
+
+                        var checkOut = register.CheckOuts.FirstOrDefault(co => co.Timestamp!.Value.Date == checkIn.Timestamp!.Value.Date && co.Timestamp.Value.TimeOfDay > checkIn.Timestamp.Value.TimeOfDay);
                         if (checkOut != null)
                         {
-                            totalHoursWorked += (decimal)(checkOut.Timestamp - checkIn.Timestamp).TotalHours;
+                            totalHoursWorked += (decimal)(checkOut.Timestamp!.Value - checkIn.Timestamp!.Value).TotalHours;
                         }
                     }
                 }
+
+                if (totalHoursWorked == 0)
+                {
+                    userDetails.HoursWorked = "Sem CheckOut realizado.";
+                    return userDetails;
+                }
+                    
                 userDetails.HoursWorked = totalHoursWorked.ToString("F2");
             }
 
@@ -253,6 +264,35 @@ namespace ClockInSync.Repositories.Repositories
 
             return userEditDetails;
 
+
+        }
+
+
+        public async Task<UserInformationResponse?> GetUserBasicInfoAsync(Guid userId)
+        {
+
+            var userFound = await dbContext.Users.AnyAsync(u => u.Id == userId);
+            if (!userFound)
+                return null;
+
+
+            var userInfo = await dbContext.Users.Select(u => new UserInformationResponse
+            {
+                Id = u.Id,
+                Email = u.Email,
+                Name = u.Name,
+                Department = u.Department,
+                Position = u.Position,
+                Level = u.Level,
+                Settings = new Dtos.Settings.SettingsDto
+                {
+                    OvertimeRate = u.Settings.OvertimeRate,
+                    WorkdayHours = u.Settings.WorkdayHours,
+                    WeeklyJourney = u.Settings.WeeklyJourney,
+                }
+            }).FirstOrDefaultAsync();
+
+            return userInfo;
 
         }
 

@@ -26,15 +26,12 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <h1>Registrar Ponto</h1>
-                    </div>                   
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
 
-
-    <section class="content">
-
-
+        <section class="content">
             <!-- Default box -->
             <div class="card">
                 <div class="card-header">
@@ -52,64 +49,64 @@
                         <div class="col-12 col-md-12 col-lg-12 order-2 order-md-1">
                             <div class="row">
                                 <div class="col-12 col-sm-4">
-                                    <p style="text-align:center;"><b>Jornada Semanal</b></p>
+                                    <p class="text-center"><b>Jornada Semanal</b></p>
                                     <div class="info-box bg-light">
                                         <div class="info-box-content" id="boxHoursWorked">
-                                            <p style="text-align: center;">8h</p>
-                                        </div>                               
-                                    </div>                                
+                                            <p class="text-center" id="weeklyJourney"></p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
-                                    <p style="text-align:center;"><b>Jornada Diária</b></p>
+                                    <p class="text-center"><b>Jornada Diária</b></p>
                                     <div class="info-box bg-light">
                                         <div class="info-box-content" id="boxDailyJourney">
-                                            <p style="text-align: center;">8h</p>
+                                            <p class="text-center" id="dailyJourney"></p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-4">
-                                    <p style="text-align:center;"><b>Jornada Mensal</b></p>
+                                    <p class="text-center"><b>Jornada Mensal</b></p>
                                     <div class="info-box bg-light">
                                         <div class="info-box-content" id="boxWeeklyJourney">
-                                            <p style="text-align: center;">8h</p>
+                                            <p class="text-center">120h</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row" id="infoPunchClockRow">
-                                
-                                <div class="card text-center">
-                    <div style="padding: 0.8rem;">
-                        <img src="https://www.svgrepo.com/show/105517/user-icon.svg" style="width: 10%;">
-                       
-                            <p style="margin-top: 0.5rem;"><b>Gabriel Gomes Luz</b></p>
-                            <p><b>Estagiário</b></p>
-
-                        
-                        <button type="button" id="registerClock" class="btn btn-success" style="border-radius: 20px;">Bater ponto</button>
-                    </div>
-                </div>
-                            </div>
+                            <div class="row" id="infoEmployeeRow">
+                                <div class="col-12">
+                                    <!-- Adicionada col-12 para alinhar corretamente -->
+                                    <div class="card text-center">
+                                        <div style="padding: 0.8rem;">
+                                            <img src="https://www.svgrepo.com/show/105517/user-icon.svg" style="width: 10%;">
+                                            <p style="margin-top: 0.5rem; margin-bottom:0.0rem"><b id="employeeName"></b></p>
+                                            <p class="text-muted" id="employeePosition"></p>
+                                            <div>
+                                                <button type="button" id="registerClock" class="btn btn-success" style="border-radius: 20px; padding-bottom: 0.6rem;">
+                                                    Bater ponto
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> <!-- Fechamento correto da col-12 -->
+                            </div> <!-- Fechamento correto da row -->
 
                             <div class="row" id="infoPunchClockRow">
                                 <h4>Registros recentes:</h4>
-                                
                             </div>
-                        </div>                       
+                        </div>
                     </div>
                 </div>
                 <!-- /.card-body -->
             </div>
             <!-- /.card -->
-
         </section>
     </div>
 
+    <script type="module" src="~/js/common.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/index.js"></script>
-
+    <script type="module" src="~/js/index.js"></script>
 
 </body>
 </html>
-

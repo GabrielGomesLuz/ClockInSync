@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ClockInSync.Repositories.ClockInSync.Dtos.PunchClock;
 using ClockInSync.Repositories.ClockInSync.Repositories;
 using ClockInSync.Repositories.Dtos.PunchClock;
 using ClockInSync.Repositories.Entities;
@@ -11,7 +12,7 @@ namespace ClockInSync.Services.PunchClockServices
     public interface IPunchClockService
     {
         Task<bool> RegisterPunchClock(Guid userId);
-        Task<IEnumerable<PunchClockSummary>> GetPunchClockSummaries(Guid userId);
+        Task<PunchClockHistory> GetPunchClockSummaries(Guid userId,int limit);
         public Task<IEnumerable<PunchClockAll>> GetPunchClockAll(Guid? userId, DateTime? startDate, DateTime? endDate);
         public Task<byte[]> ExportPunchClockAll(DateTime? startDate, DateTime? endDate);
     }
@@ -43,9 +44,9 @@ namespace ClockInSync.Services.PunchClockServices
             return await punchClockRepository.GetAllPunchClock(userId, startDate, endDate);
         }
 
-        public async Task<IEnumerable<PunchClockSummary>> GetPunchClockSummaries(Guid userId)
+        public async Task<PunchClockHistory> GetPunchClockSummaries(Guid userId,int limit)
         {
-            return await punchClockRepository.GetPunchClockSummaries(userId);
+            return await punchClockRepository.GetPunchClockSummaries(userId,limit);
         }
 
         public async Task<bool> RegisterPunchClock(Guid userId)
@@ -74,7 +75,7 @@ namespace ClockInSync.Services.PunchClockServices
             punchClock.UserId = userId;
             punchClock.Id = Guid.NewGuid();
             punchClock.Timestamp = DateTime.Now;
-            punchClock.Message = punchClock.Type == PunchClock.PunchType.CheckIn ? "Entrada registrada com sucesso." : "Saída registrada com sucesso";
+            punchClock.Message = punchClock.Type == PunchClock.PunchType.CheckIn ? "Entrada registrada com sucesso" : "Saída registrada com sucesso";
 
             return await punchClockRepository.RegisterPunchClockAsync(punchClock);
         }

@@ -1,5 +1,7 @@
+import { convertToHtml } from "./common.js";
+const container = document.getElementById('infoPunchClockRow');
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Função para obter o token JWT do localStorage
     const token = localStorage.getItem('jwt');
 
@@ -16,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Fazer uma requisição GET para a API de Funcionários
-    fetch('/api/User/v1/user/infos', {
+    fetch('/api/User/v1/users/infos', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const boxHoursWorked = document.getElementById('boxHoursWorked');
         const boxDailyJourney = document.getElementById('boxDailyJourney');
         const boxWeeklyJourney = document.getElementById('boxWeeklyJourney');
-        const container = document.getElementById('infoPunchClockRow');
+        
 
         // Limpar o conteúdo anterior, se necessário
         boxHoursWorked.innerHTML = '';
@@ -86,7 +88,8 @@ document.addEventListener("DOMContentLoaded", function() {
             // Formatar data de check-in
             const checkInDate = checkIn ? new Date(checkIn.timestamp) : null;
             const checkOutDate = checkOut ? new Date(checkOut.timestamp) : null;
-
+            console.log(checkIn);
+            console.log(checkInDate)
             const formatDate = (date) => {
             if (date) {
                 const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
@@ -94,76 +97,16 @@ document.addEventListener("DOMContentLoaded", function() {
             }
               return '';
             };
+            console.log(formatDate(checkOutDate))
+            const formattedCheckInDate = formatDate(checkInDate);
+            const formatCheckoutDate = formatDate(checkOutDate);
 
-            if(checkIn != null && checkOut == null){
-                 const htmlContent = `
-                    <div class="col-12">                               
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="post">
-                                    <div class="user-block">
-                                        <span class="username" id="nameUserPunchClock" style="margin-left: 0;">
-                                            ${data.name}
-                                        </span>
-                                        <span class="description" id="datePunchClock" style="margin-left: 0;">
-                                            ${register.checkIns[0].message} - ${checkInDate}
-                                        </span>
-                                    </div>
-                                <p id="messagePunchClock">
-
-                                </p>
-                            </div>
-                        </div>
-                       </div>
-                 `;
-
-             container.innerHTML += htmlContent;
-            }else if(checkIn != null && checkOut != null){
-                const htmlContent = `
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="post">
-                                    <div class="user-block">
-                                        <span class="username" id="nameUserPunchClock" style="margin-left: 0;">
-                                            ${data.name}
-                                        </span>
-                                        <span class="description" id="datePunchClock" style="margin-left: 0;">
-                                            ${register.checkIns[0].message} - ${checkInDate}
-                                        </span>
-                                    </div>
-                                <p id="messagePunchClock">
-
-                                </p>
-                            </div>
-                        </div>
-                       </div>
-                 `;
-                 container.innerHTML += htmlContent;
-
-                 const newHtmlContent = `
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="post">
-                                    <div class="user-block">
-                                        <span class="username" id="nameUserPunchClock" style="margin-left: 0;">
-                                            ${data.name}
-                                        </span>
-                                        <span class="description" id="datePunchClock" style="margin-left: 0;">
-                                            ${register.checkOuts[0].message} - ${checkOutDate}
-                                        </span>
-                                    </div>
-                                <p id="messagePunchClock">
-
-                                </p>
-                            </div>
-                        </div>
-                       </div>
-                 `;
-                 container.innerHTML += newHtmlContent;
+            if (checkIn != null && checkOut == null) {
+                container.innerHTML += convertToHtml(data.name, register.checkIns[0].message, null, formattedCheckInDate,null);
             }
-        
+            else if (checkIn != null && checkOut != null) {
+                container.innerHTML += convertToHtml(data.name, register.checkIns[0].message, register.checkOuts[0].message, formattedCheckInDate, formatCheckoutDate);
+            }
         });
 
 
@@ -180,5 +123,8 @@ document.addEventListener("DOMContentLoaded", function() {
         console.error('Erro ao buscar os dados dos funcionários:', error);
     });
 });
+
+
+
 
 
