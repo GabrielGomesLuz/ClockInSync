@@ -1,10 +1,14 @@
 ﻿using ClockInSync.Repositories.ClockInSync.Dtos.User.UserResponse;
 using ClockInSync.Repositories.DbContexts;
+using ClockInSync.Repositories.Dtos.Settings;
 using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Repositories.Dtos.User.UserResponse;
 using ClockInSync.Repositories.Entities;
 using ClockInSync.Repositories.PasswordManagementHelper;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
+using static ClockInSync.Repositories.Entities.PunchClock;
 
 namespace ClockInSync.Repositories.Repositories
 {
@@ -13,18 +17,25 @@ namespace ClockInSync.Repositories.Repositories
     {
         Task<UserRegisterResponse> CreateUserAsync(User user);
 
-        Task<UserInformationResponse?> UpdateUserAsync(User user);
+        Task<string?> UpdateUserAsync(User user);
 
 
         Task<bool> DeleteUserAsync(Guid userId);
 
         Task<UserLoginInformationResponse?> GetUserByEmailAsync(string email);
 
-        Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync();
+        Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync(int offset, int limit);
 
         Task<UserLoginInformationResponse?> VerifyUserLoginAsync(User login);
 
         Task<bool> VerifyUserExistsByEmailAsync(string email);
+
+        public Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId);
+
+        public Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId);
+
+        Task<UserInformationResponse?> GetUserBasicInfoAsync(Guid userId);
+
     }
 
     public class UserRepository(ClockInSyncDbContext dbContext) : IUserRepository
@@ -73,34 +84,63 @@ namespace ClockInSync.Repositories.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync()
+        public async Task<IEnumerable<UserInformationResponse>> GetUsersInformationAsync(int offset, int limit)
         {
             return await dbContext.Users
+        .Skip(offset)
         .Select(u => new UserInformationResponse
         {
             Id = u.Id,
             Email = u.Email,
             Name = u.Name,
-            Settings = new Dtos.Settings.SettingsDto { OvertimeRate = u.Settings.OvertimeRate, WorkdayHours = u.Settings.WorkdayHours }
+            Department = u.Department,
+            Position = u.Position,
+            Level = u.Level,
+            Settings = new Dtos.Settings.SettingsDto
+            {
+                OvertimeRate = u.Settings.OvertimeRate,
+                WorkdayHours = u.Settings.WorkdayHours,
+                WeeklyJourney = u.Settings.WeeklyJourney,
+            }
         })
         .ToListAsync();
+
+
         }
 
-        public async Task<UserInformationResponse?> UpdateUserAsync(User user)
+        public async Task<string?> UpdateUserAsync(User user)
         {
-            if (user != null)
+
+            var userFound = await VerifyUserExistsById(user.Id);
+            if (userFound)
             {
+                var userOld = await GetUserCredentialsByIdAsync(user.Id);
+                user.Password = userOld.UserPassword;
                 dbContext.Users.Update(user);
                 await dbContext.SaveChangesAsync();
-                return new UserInformationResponse
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    Name = user.Name
-                };
+                return "Dados atualizados com sucesso.";
             }
-            return null;
+            return "Usuário não existe.";
         }
+
+
+        private async Task<UserCredentialsResponse> GetUserCredentialsByIdAsync(Guid userId)
+        {
+            var userData = await dbContext.Users.Where(u => u.Id == userId).Select(u => new UserCredentialsResponse
+            {
+                UserName = u.Name,
+                UserPassword = u.Password,
+            }).FirstOrDefaultAsync();
+
+            return userData;
+        }
+        private async Task<bool> VerifyUserExistsById(Guid userId)
+        {
+
+            return await dbContext.Users.AnyAsync(u => u.Id == userId);
+
+        }
+
 
         public async Task<UserLoginInformationResponse?> VerifyUserLoginAsync(User login)
         {
@@ -122,5 +162,139 @@ namespace ClockInSync.Repositories.Repositories
         {
             return await dbContext.Users.AnyAsync(p => p.Email == email);
         }
+
+        public async Task<UserAllDetailsResponse?> GetUserAllDetails(Guid userId)
+        {
+            var userFound = await dbContext.Users.AnyAsync(u => u.Id == userId);
+
+            if (!userFound)
+                return null;
+
+            var userDetails = await dbContext.Users
+    .Where(u => u.Id == userId)
+    .Select(u => new UserAllDetailsResponse
+    {
+        Id = u.Id,
+        Name = u.Name,
+        Email = u.Email,
+        Role = u.Role,
+        Department = u.Department,
+        Position = u.Position,
+        Level = u.Level,
+        Settings = new SettingsDto
+        {
+            WorkdayHours = u.Settings.WorkdayHours,
+            OvertimeRate = u.Settings.OvertimeRate,
+            WeeklyJourney = u.Settings.WeeklyJourney
+        },
+        Registers = dbContext.PunchClocks
+            .Where(p => p.UserId == u.Id)
+            .GroupBy(p => new { p.UserId, p.Timestamp!.Value.Date })
+            .Select(g => new Registers
+            {
+                Date = g.Key.Date,
+                CheckIns = g.Where(x => x.Type == PunchType.CheckIn)
+                            .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
+                            .ToList(),
+                CheckOuts = g.Where(x => x.Type == PunchType.CheckOut)
+                             .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
+                             .ToList(),
+            })
+            .OrderByDescending(r => r.Date)
+            .ToList()
+    })
+    .FirstOrDefaultAsync();
+
+            if (userDetails != null)
+            {
+                decimal totalHoursWorked = 0;
+                foreach (var register in userDetails.Registers)
+                {
+                    foreach (var checkIn in register.CheckIns)
+                    {
+
+                        var checkOut = register.CheckOuts.FirstOrDefault(co => co.Timestamp!.Value.Date == checkIn.Timestamp!.Value.Date && co.Timestamp.Value.TimeOfDay > checkIn.Timestamp.Value.TimeOfDay);
+                        if (checkOut != null)
+                        {
+                            totalHoursWorked += (decimal)(checkOut.Timestamp!.Value - checkIn.Timestamp!.Value).TotalHours;
+                        }
+                    }
+                }
+
+                if (totalHoursWorked == 0)
+                {
+                    userDetails.HoursWorked = "Sem CheckOut realizado.";
+                    return userDetails;
+                }
+                    
+                userDetails.HoursWorked = totalHoursWorked.ToString("F2");
+            }
+
+            return userDetails;
+
+
+        }
+
+        public async Task<UserInfoToEditResponse?> GetUserInfoToEditAsync(Guid userId)
+        {
+            var userFound = await dbContext.Users.AnyAsync(u => u.Id == userId);
+
+            if (!userFound)
+                return null;
+
+            var userEditDetails = await dbContext.Users
+    .Where(u => u.Id == userId)
+    .Select(u => new UserInfoToEditResponse
+    {
+        Id = u.Id,
+        Name = u.Name,
+        Email = u.Email,
+        Department = u.Department,
+        Position = u.Position,
+        Role = u.Role,
+        Level = u.Level,
+        Settings = new SettingsDto
+        {
+            WorkdayHours = u.Settings.WorkdayHours,
+            OvertimeRate = u.Settings.OvertimeRate,
+            WeeklyJourney = u.Settings.WeeklyJourney
+        },
+    })
+    .FirstOrDefaultAsync();
+
+            return userEditDetails;
+
+
+        }
+
+
+        public async Task<UserInformationResponse?> GetUserBasicInfoAsync(Guid userId)
+        {
+
+            var userFound = await dbContext.Users.AnyAsync(u => u.Id == userId);
+            if (!userFound)
+                return null;
+
+
+            var userInfo = await dbContext.Users.Select(u => new UserInformationResponse
+            {
+                Id = u.Id,
+                Email = u.Email,
+                Name = u.Name,
+                Department = u.Department,
+                Position = u.Position,
+                Level = u.Level,
+                Settings = new Dtos.Settings.SettingsDto
+                {
+                    OvertimeRate = u.Settings.OvertimeRate,
+                    WorkdayHours = u.Settings.WorkdayHours,
+                    WeeklyJourney = u.Settings.WeeklyJourney,
+                }
+            }).FirstOrDefaultAsync();
+
+            return userInfo;
+
+        }
+
     }
 }

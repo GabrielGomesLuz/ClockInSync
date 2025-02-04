@@ -4,6 +4,7 @@ using ClockInSync.Repositories.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClockInSync.Repositories.Migrations
 {
     [DbContext(typeof(ClockInSyncDbContext))]
-    partial class ClockInSyncDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250106222117_Add_Position_And_Department_In_User")]
+    partial class Add_Position_And_Department_In_User
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,11 +86,6 @@ namespace ClockInSync.Repositories.Migrations
                         .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("varchar(254)");
-
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Name")
                         .IsRequired()

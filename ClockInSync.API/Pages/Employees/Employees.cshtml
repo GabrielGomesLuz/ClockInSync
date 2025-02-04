@@ -1,0 +1,138 @@
+﻿@page "/funcionarios"
+
+@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Funcionários</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0" />
+</head>
+<body>
+    <h1>Funcionários</h1>
+    <div class="mb-3">
+        <button type="button" id="newEmployee" class="btn btn-default btn-sm checkbox-toggle">
+            <i class="bi bi-plus-square-fill"></i>
+        </button>
+    </div>
+    <section class="content">
+        <table class="table align-middle mb-0 bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th></th>
+                    <th>Nome</th>
+                    <th>Departamento</th>
+                    <th>Nível</th>
+
+                </tr>
+            </thead>
+            <tbody id="user-list">
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example" id="pagination">
+
+        </nav>
+    </section>
+
+
+    <script>
+
+        let offset = 0
+        const limit = 10
+                function loadUsers(offset = 0, limit = 10) {
+            const token = localStorage.getItem('jwt');
+
+            if (!token) {
+                console.log('Usuário não autenticado. Redirecionando para o login...');
+                window.location.href = '/login';
+                return;
+            }
+
+            fetch(`/api/User/v1/users?offset=${offset}&limit=${limit}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        console.error('Erro:', errorData);
+                        alert('Erro ao carregar os funcionários. Você pode ser deslogado.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                const funcionarioList = document.getElementById('user-list');
+
+                data.forEach(funcionario => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td scope="row" style="width: 0;">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="First group">
+                                <a href="/funcionario/${funcionario.id}/detalhes" role="button" class="btn btn-acao">
+                                    <i class="bi bi-info-square"></i>
+                                </a>
+                                <a href="/funcionario/editar/${funcionario.id}" role="button" class="btn btn-acao">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="align-items-center">
+                                <p class="fw-bold mb-1" id="userName">${funcionario.name}</p>
+                                <p class="text-muted mb-0" id="userEmail">${funcionario.email}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="fw-normal mb-1">${funcionario.position}</p>
+                            <p class="text-muted mb-0">${funcionario.department}</p>
+                        </td>
+                        <td>${funcionario.level}</td>
+                    `;
+                    funcionarioList.appendChild(row);
+                });
+
+                const loadMoreButton = document.getElementById('pagination');
+
+                // Verificar se o botão "Carregar mais" já existe e removê-lo
+                loadMoreButton.innerHTML = '';
+                console.log(data.length);
+                if (data.length === limit) {
+                    loadMoreButton.innerHTML = `
+                        <ul class="pagination" style="padding:0.5rem;">
+                            <li class="page-item">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="loadUsers(${offset + limit}, ${limit})">Carregar mais...</button>
+                            </li>
+                        </ul>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao buscar os dados dos funcionários:', error);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            loadUsers(offset, limit); // Chama a função com o offset inicial de 0
+        });
+
+        const newEmployee = document.getElementById('newEmployee');
+        
+        newEmployee.addEventListener('click',() => {
+
+
+            window.location.href = '/novo/funcionario';
+
+        })
+
+    </script>
+</body>
+</html>

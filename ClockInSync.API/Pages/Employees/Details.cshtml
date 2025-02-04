@@ -1,0 +1,123 @@
+﻿@page "/funcionario/{userId:guid}/detalhes"
+
+
+@{
+    Layout = "_Layout";
+}
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Funcionários</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0" />
+</head>
+<body>
+
+    <div class="content-wrapper" style="margin-left:0">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Detalhe do funcionário</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">Detalhe do funcionário</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+
+        <section class="content">
+
+
+            <!-- Default box -->
+            <div class="card">
+                <div class="card-header">
+                    <button type="button" onclick="window.history.back()" title="Voltar" class="btn btn-sm btn-default d-none d-xl-block d-lg-block d-xl-none">
+                        <i class="bi bi-arrow-90deg-left" style="color: blue;/*! text-align: left; *//*! border: solid 2px; */font-style: normal;"> Voltar</i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+                            <div class="row">
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content" id="boxHoursWorked">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content" id="boxDailyJourney">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <div class="info-box bg-light">
+                                        <div class="info-box-content" id="boxWeeklyJourney">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row info-box bg-light" id="infoPunchClockRow" style="margin-inline-start: 0.0rem;">
+                                <h4>Registros recentes:</h4>
+                                
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                            <h3 class="text-primary"><i class="fas fa-paint-brush"></i> Dados</h3>
+                            <div class="text-muted">
+                                <p class="text-sm">
+                                    Nome do funcionário:
+                                    <b class="d-block" id="dataUserName"></b>
+                                </p>
+                                <p class="text-sm">
+                                    Jornada de trabalho semanal:
+                                    <b class="d-block" id="dataWeeklyJourney"></b>
+                                </p>
+                                <p class="text-sm">
+                                    Tipo de usuário:
+                                    <b class="d-block" id="dataRole"></b>
+                                </p>
+                                <p class="text-sm">
+                                    Cargo:
+                                    <b class="d-block" id="dataPosition"></b>
+                                </p>
+                                <p class="text-sm">
+                                    Setor:
+                                    <b class="d-block" id="dataDepartment"></b>
+                                </p>
+                                <p class="text-sm">
+                                    Nível:
+                                    <b class="d-block" id="dataLevel"></b>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+        </section>
+    </div>
+    <script type="module" src="~/js/common.js"></script>
+    <script type="module" src="~/js/detailsEmployee.js"></script>
+
+
+</body>
+</html>
+

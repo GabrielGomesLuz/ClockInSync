@@ -17,7 +17,9 @@ namespace ClockInSync.Repositories.Entities
         public PunchType Type { get; set; }  // Tipo de ação (check-in ou check-out)
 
         [Required]
-        public DateTime Timestamp { get; set; }  // Data e hora do punch
+        public DateTime? Timestamp { get; set; }  // Data e hora do punch
+
+        public string Message { get; set; } = string.Empty;
 
         // Relacionamento com o usuário
         [ForeignKey("UserId")]

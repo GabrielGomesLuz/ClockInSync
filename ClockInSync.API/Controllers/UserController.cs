@@ -2,6 +2,8 @@
 using ClockInSync.Repositories.Dtos.User;
 using ClockInSync.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace ClockInSync.API.Controllers
 {
@@ -41,11 +43,53 @@ namespace ClockInSync.API.Controllers
                 var passwordMatch = await userService.LoginUserAsync(userLoginDto);
                 if (passwordMatch != null)
                     return Ok(passwordMatch);
-                return BadRequest("Senha inválida.");
+                return BadRequest(new { message = "Senha inválida" });
 
             }
 
-            return BadRequest("Email não cadastrado no sistema.");
+            return BadRequest(new { message = "Email não cadastrado no sistema." });
         }
+
+        [HttpGet("users")]
+        public async Task<ActionResult> GetAllUsers([FromQuery] int offset, [FromQuery] int limit)
+        {
+            return Ok(await userService.GetUsersInformationAsync(offset, limit));
+        }
+
+        [HttpGet("users/infos")]
+        public async Task<ActionResult> GetAllInfosUser([Required][FromHeader] Guid userId)
+        {
+            return Ok(await userService.GetUserAllDetails(userId));
+        }
+
+        [HttpGet("user/info")]
+        public async Task<ActionResult> GetInfoUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return NotFound("Usuário inválido.");
+            return Ok(await userService.GetUserInformation(Guid.Parse(userId)));
+        }
+
+        [HttpPut("put/user/edit")]
+        public async Task<ActionResult> PutUser([FromBody]UserEditDto userEditDto)
+        {
+            if(userEditDto == null)
+                return BadRequest("Ocorreu um erro ao atualizar os dados");
+
+            var message = await userService.UpdateUserAsync(userEditDto);
+                
+            return Ok(new { message });
+
+
+
+        }
+
+        [HttpGet("user/edit/infos")]
+        public async Task<ActionResult> GetInfoToEditUser([FromHeader] Guid userId)
+        {
+            return Ok(await userService.GetUserInfoToEditAsync(userId));
+        }
+       
     }
 }

@@ -1,5 +1,7 @@
-﻿using ClockInSync.Repositories.DbContexts;
+﻿using ClockInSync.Repositories.ClockInSync.Dtos.PunchClock;
+using ClockInSync.Repositories.DbContexts;
 using ClockInSync.Repositories.Dtos.PunchClock;
+using ClockInSync.Repositories.Dtos.User.UserResponse;
 using ClockInSync.Repositories.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -12,22 +14,25 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
     {
         Task<bool> RegisterPunchClockAsync(PunchClock punchClock);
 
-        public Task<IEnumerable<PunchClockSummary>> GetPunchClockSummaries(Guid userId);
+        public Task<PunchClockHistory> GetPunchClockSummaries(Guid userId,int limit);
 
         public Task<IEnumerable<PunchClockAll>> GetAllPunchClock(Guid? userId,DateTime? startDate, DateTime? endDate);
 
         public Task<ExportPunchClockAll> ExportAllPunchClocks(DateTime? startDate, DateTime? endDate);
+
+        public Task<PunchType?> GetPunchClockPrevious(Guid userId);
+
     }
 
     public class PunchClockRepository(ClockInSyncDbContext dbContext) : IPunchClockRepository
     {
         public readonly ClockInSyncDbContext dbContext = dbContext;
 
-        public async Task<IEnumerable<PunchClockSummary>> GetPunchClockSummaries(Guid userId)
+        public async Task<PunchClockHistory> GetPunchClockSummaries(Guid userId, int limit)
         {
             var punchClockData = await dbContext.PunchClocks
        .Where(pc => pc.UserId == userId)
-       .GroupBy(pc => pc.Timestamp.Date)
+       .GroupBy(pc => pc.Timestamp!.Value.Date)
        .Select(group => new
        {
            Date = group.Key,
@@ -38,19 +43,30 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
                            .Select(x => x.Timestamp)
                            .FirstOrDefault()
        })
-       .ToListAsync();
+       .Take(limit).ToListAsync();
 
-            var punchClockSummaries = punchClockData
-        .Select(x => new PunchClockSummary
-        {
-            Date = x.Date.ToString("yyyy-MM-dd"),
-            CheckIn = x.CheckIn.ToString("HH:mm") ?? "Sem CheckIn realizado.",
-            CheckOut = x.CheckOut.ToString("HH:mm") ?? "Sem CheckOut realizado.",
-            HoursWorked = CalculateHoursWorked(x.CheckIn, x.CheckOut).ToString("F2", CultureInfo.InvariantCulture) ?? "0.00"
-        })
-        .ToList();
+            // Consulta única para evitar listas dentro de listas
+            var registers = await dbContext.PunchClocks
+                .Where(p => p.UserId == userId)
+                .GroupBy(p => new { p.UserId, p.Timestamp!.Value.Date })
+                .Select(g => new Registers
+                {
+                    Date = g.Key.Date,
+                    CheckIns = g.Where(x => x.Type == PunchType.CheckIn)
+                                .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
+                                .ToList(),
+                    CheckOuts = g.Where(x => x.Type == PunchType.CheckOut)
+                                 .Select(x => new PunchDetail { Timestamp = x.Timestamp, Message = x.Message })
+                                 .ToList(),
+                })
+                .OrderByDescending(r => r.Date)
+                .ToListAsync();
 
-            return punchClockSummaries;
+            var punchClockSummary = new PunchClockHistory
+            {
+                Registers = registers
+            };
+            return punchClockSummary;
         }
 
         public async Task<bool> RegisterPunchClockAsync(PunchClock punchClock)
@@ -60,7 +76,7 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
             return isRegister > 0;
         }
 
-        private static double CalculateHoursWorked(DateTime? checkIn, DateTime? checkOut)
+        private static double? CalculateHoursWorked(DateTime? checkIn, DateTime? checkOut)
         {
             if (checkIn.HasValue && checkOut.HasValue)
             {
@@ -68,7 +84,7 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
                 return Math.Round(totalMinutes / 60, 2);
 
             }
-            return 0;
+            return null;
         }
 
         public async Task<IEnumerable<PunchClockAll>> GetAllPunchClock(Guid? userId, DateTime? startDate, DateTime? endDate)
@@ -95,19 +111,19 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
             // Filtrar por intervalo de datas se fornecido
             if (startDate.HasValue && startDate != default(DateTime))
             {
-                query = query.Where(pc => pc.Timestamp.Date >= startDate.Value.Date);
+                query = query.Where(pc => pc.Timestamp!.Value >= startDate.Value.Date);
             }
 
             if (endDate.HasValue && endDate != default(DateTime))
             {
-                query = query.Where(pc => pc.Timestamp.Date <= endDate.Value.Date);
+                query = query.Where(pc => pc.Timestamp!.Value <= endDate.Value.Date);
             }
 
             var punchClockData = await query
-                .GroupBy(pc => new { pc.Timestamp.Date, pc.UserId, pc.UserName }) // Agrupar por data, usuário e nome
+                .GroupBy(pc => new { pc.Timestamp!.Value, pc.UserId, pc.UserName }) // Agrupar por data, usuário e nome
                 .Select(group => new
                 {
-                    Date = group.Key.Date,
+                    Date = group.Key.Value,
                     UserName = group.Key.UserName,
                     CheckIn = group.Where(x => x.Type == PunchType.CheckIn)
                                    .Select(x => x.Timestamp)
@@ -123,11 +139,11 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
                 {
                     Date = x.Date.ToString("yyyy-MM-dd"),
                     Name = x.UserName,
-                    CheckIn = x.CheckIn != default ? x.CheckIn.ToString("HH:mm") : "Sem CheckIn realizado.",
-                    CheckOut = x.CheckOut != default ? x.CheckOut.ToString("HH:mm") : "Sem CheckOut realizado.",
+                    CheckIn = x.CheckIn != default ? x.CheckIn?.ToString("HH:mm") : "Sem CheckIn realizado.",
+                    CheckOut = x.CheckOut != default ? x.CheckOut?.ToString("HH:mm") : "Sem CheckOut realizado.",
                     HoursWorked = x.CheckIn != default && x.CheckOut != default
-                        ? CalculateHoursWorked(x.CheckIn, x.CheckOut).ToString("F2", CultureInfo.InvariantCulture)
-                        : "0.00"
+                        ? CalculateHoursWorked(x.CheckIn, x.CheckOut)?.ToString("F2", CultureInfo.InvariantCulture)
+                        : "Sem CheckOut realizado."
                 })
                 .ToList();
 
@@ -166,12 +182,12 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
             // Filtrar por intervalo de datas se fornecido
             if (startDate.HasValue && startDate != default(DateTime))
             {
-                query = query.Where(pc => pc.Timestamp.Date >= startDate.Value.Date);
+                query = query.Where(pc => pc.Timestamp!.Value >= startDate.Value.Date);
             }
 
             if (endDate.HasValue && endDate != default(DateTime))
             {
-                query = query.Where(pc => pc.Timestamp.Date <= endDate.Value.Date);
+                query = query.Where(pc => pc.Timestamp!.Value <= endDate.Value.Date);
             }
 
 
@@ -199,8 +215,8 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
                 {
                     Name = x.UserName,
                     HoursWorked = x.CheckIn != default && x.CheckOut != default
-                        ? CalculateHoursWorked(x.CheckIn, x.CheckOut).ToString("F2", CultureInfo.InvariantCulture)
-                        : "0.00",
+                        ? CalculateHoursWorked(x.CheckIn, x.CheckOut)?.ToString("F2", CultureInfo.InvariantCulture)
+                        : "Nenhum check-out realizado.",
                     WeeklyJourney = x.WeeklyJourney,
 
                 })
@@ -214,6 +230,19 @@ namespace ClockInSync.Repositories.ClockInSync.Repositories
 
         }
 
+        public async Task<PunchType?> GetPunchClockPrevious(Guid userId)
+        {
+            var punchClocks = await dbContext.PunchClocks.OrderByDescending(x => x.Timestamp).FirstOrDefaultAsync();
+            if (punchClocks != null)
+            {
+                var result = new RegisterPunchClock
+                {
+                    Type = punchClocks.Type,
+                };
+                return result.Type;
+            }
 
+            return null;
+        }
     }
 }

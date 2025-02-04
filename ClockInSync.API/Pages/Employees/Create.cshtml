@@ -1,0 +1,129 @@
+﻿@page "/novo/funcionario"
+
+@{
+    Layout = "_Layout";
+}
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar funcionário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0" />
+</head>
+<body>
+
+
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Criar novo funcionário</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Criar novo funcionário</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+
+    <section class="content">
+        <form id="postNewEmployee">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Dados</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputName">Nome</label>
+                                <input type="text" required="true" id="inputName" class="form-control">
+                                <p id="inputNameError"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail">Email</label>
+                                <input type="email" required="true" id="inputEmail" class="form-control">
+                                <p id="inputEmailError"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputRole">Tipo de usúario</label>
+                                <select id="inputRole" class="form-control custom-select">
+                                    <option selected="" disabled="">Selecione</option>
+                                    <option>Employee</option>
+                                    <option>Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword">Senha</label>
+                                <input type="password" required="true" id="inputPassword" class="form-control">
+                                <p id="inputPasswordError"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputDepartment">Departamento</label>
+                                <input type="text" required="true" id="inputDepartment" class="form-control">
+                                <p id="inputDepartmentError"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputLevel">Nível</label>
+                                <input type="text" required="true" id="inputLevel" class="form-control">
+                                <p id="inputLevelError"></p>
+                            </div>
+
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title">Configurações</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="inputWeeklyJourney">Jornada Semanal</label>
+                                <input type="number" required="true" id="inputWeeklyJourney" class="form-control" step="1">
+                                <p id="inputWeeklyJourneyError"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputDailyJourney">Jornada diária</label>
+                                <input type="number" required="true" id="inputDailyJourney" class="form-control" step="1">
+                                <p id="inputDailyJourneyError"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputTaxOvertimeHours">Taxa de horas extras</label>
+                                <input type="number" required="true" id="inputTaxOvertimeHours" class="form-control" step="0.1">
+                                <p id="inputTaxOvertimeHoursError"></p>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <a href="#" class="btn btn-secondary">Cancelar</a>
+                    <input type="submit" value="Salvar" class="btn btn-success float-right">
+                </div>
+            </div>
+        </form>       
+    </section>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/js/createEmployee.js"></script>
+
+
+</body>
+</html>

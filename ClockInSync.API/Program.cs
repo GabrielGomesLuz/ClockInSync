@@ -65,6 +65,8 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);   // Define a versão padrão
     options.ReportApiVersions = true;                    // Permite que as versões da API sejam reportadas
 });
+
+builder.Services.AddRazorPages();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -85,9 +87,10 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 
 
-
+app.MapRazorPages();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
